@@ -1,0 +1,141 @@
+/* App.css */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  max-width: 100%; /* Используем всю ширину экрана */
+  padding: 20px 10px; /* Убираем отступы по бокам */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 карточек в ряд */
+  gap: 10px; /* Отступ между карточками 10px */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Card styles */
+.card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.player-name {
+  font-size: 16px;
+  margin-bottom: 12px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+p {
+  margin: 8px 0;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  transition: background-color 0.2s;
+}
+
+p:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+button {
+  margin-top: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+button:nth-child(2) {
+  background-color: #dc3545;
+  color: white;
+}
+
+button:nth-child(2):hover {
+  background-color: #c82333;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .cards-container {
+    grid-template-columns: repeat(5, 1fr); /* 5 карточек в ряд на экранах до 1200px */
+  }
+}
+
+@media (max-width: 1024px) {
+  .cards-container {
+    grid-template-columns: repeat(4, 1fr); /* 4 карточки в ряд на экранах до 1024px */
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 карточки в ряд на экранах до 768px */
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-container {
+    grid-template-columns: 1fr; /* 1 карточка в ряд на экранах до 480px */
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  p {
+    font-size: 12px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
