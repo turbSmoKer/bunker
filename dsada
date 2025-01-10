@@ -1,134 +1,178 @@
-import React, { useState } from "react";
-import Card from "./Card";
-import generateRandomAttributes from "./randomAttributes";
-import "./App.css";
+/* App.css */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-const catastrophes = [
-  "Глобальная пандемия вируса, уничтожившая большинство населения.",
-  "Землетрясение разрушает большую часть города.",
-  "Ядерная война",
-  "Глобальное изменение климата, затопление городов",
-  "Метеоритный дождь, разрушивший инфраструктуру",
-  "Пожар в крупных городах, уничтожение экосистемы",
-  "Глобальная террористическая угроза",
-  "Зомби-апокалипсис",
-  "Вулканическое извержение",
-  "Глобальная экономическая катастрофа",
-];
+.app {
+  width: 100%;
+  max-width: 100%; /* Используем всю ширину экрана */
+  padding: 20px 10px; /* Убираем отступы по бокам */
+  text-align: center;
+  box-sizing: border-box;
+}
 
-const bunkerLocations = [
-  "Под старым заводом",
-  "В подземном гараже",
-  "В подземной военной базе",
-  "В подземной лаборатории",
-  "В подземном убежище на ферме",
-];
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #444;
+}
 
-const areas = ["150 кв. м", "200 кв. м", "250 кв. м", "300 кв. м"];
-const peoples = ["0", "10", "100", "1000", "10000"];
-const timesInBunker = ["1 месяц", "2 месяца", "3 месяца", "4 недели"];
-const inventory = [
-  "Продукты питания (портятся через 2 недели)",
-  "Аптечка",
-  "2 пистолета + патроны",
-  "Запасы воды и консервов",
-  "Оружие",
-];
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 карточек в ряд */
+  gap: 10px; /* Отступ между карточками 10px */
+  width: 100%;
+  box-sizing: border-box;
+}
 
-const generateRandomScenario = () => {
-  const catastrophe = catastrophes[Math.floor(Math.random() * catastrophes.length)];
-  const bunkerLocation = bunkerLocations[Math.floor(Math.random() * bunkerLocations.length)];
-  const area = areas[Math.floor(Math.random() * areas.length)];
-  const timeInBunker = timesInBunker[Math.floor(Math.random() * timesInBunker.length)];
-  const inventoryItems = inventory.sort(() => 0.5 - Math.random()).slice(0, 3);
-  const peopl = peoples[Math.floor(Math.random() * peoples.length)];
+/* Card styles */
+.card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
 
-  return {
-    catastrophe,
-    bunkerLocation,
-    area,
-    timeInBunker,
-    inventory: inventoryItems,
-    peoples: peopl,
-  };
-};
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
 
-const App = () => {
-  const [scenario, setScenario] = useState(generateRandomScenario());
-  const [cards, setCards] = useState(
-    Array.from({ length: 12 }, () => ({
-      id: crypto.randomUUID(),
-      ...generateRandomAttributes(),
-      revealed: {
-        health: false,
-        profession: false,
-        hobby: false,
-        age: false,
-        phobia: false,
-      },
-      playerName: `Игрок ${Math.floor(Math.random() * 100)}`,
-    }))
-  );
+.player-name {
+  font-size: 18px; /* Увеличиваем шрифт */
+  margin-bottom: 12px;
+  padding: 10px; /* Увеличиваем отступы */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  const toggleReveal = (id, key) => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === id
-          ? {
-              ...card,
-              revealed: { ...card.revealed, [key]: !card.revealed[key] },
-            }
-          : card
-      )
-    );
-  };
+p {
+  margin: 8px 0;
+  font-size: 16px; /* Увеличиваем шрифт */
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  justify-content: space-between; /* Распределение элементов по бокам */
+  transition: background-color 0.2s;
+}
 
-  const updatePlayerName = (id, newName) => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === id ? { ...card, playerName: newName } : card
-      )
-    );
-  };
+p:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
 
-  const deleteCard = (id) => {
-    setCards((prevCards) => prevCards.filter((card) => card.id !== id));
-  };
+button {
+  margin-top: 12px;
+  padding: 10px 14px; /* Увеличиваем отступы */
+  font-size: 16px; /* Увеличиваем шрифт */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
-  const regenerateScenario = () => {
-    setScenario(generateRandomScenario());
-  };
+button:hover {
+  background-color: #007bff;
+  color: white;
+}
 
-  return (
-    <div className="app">
-      <div className="header">
-        <h1>Игра "Бункер"</h1>
-        <button onClick={regenerateScenario} className="regenerate-button">
-          Изменить условия
-        </button>
-      </div>
-      <div className="scenario">
-        <span><strong>Катастрофа:</strong> {scenario.catastrophe}</span>
-        <span><strong>Бункер:</strong> {scenario.bunkerLocation}</span>
-        <span><strong>Площадь:</strong> {scenario.area}</span>
-        <span><strong>Время в бункере:</strong> {scenario.timeInBunker}</span>
-        <span><strong>Осталось людей:</strong> {scenario.peoples}</span>
-        <span><strong>Инвентарь:</strong> {scenario.inventory.join(", ")}</span>
-      </div>
-      <div className="cards-container">
-        {cards.map((card) => (
-          <Card
-            key={card.id}
-            attributes={card}
-            onToggle={(key) => toggleReveal(card.id, key)}
-            playerName={card.playerName}
-            onNameChange={(newName) => updatePlayerName(card.id, newName)}
-            onDelete={() => deleteCard(card.id)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+button:nth-child(2) {
+  background-color: #dc3545;
+  color: white;
+}
 
-export default App;
+button:nth-child(2):hover {
+  background-color: #c82333;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .cards-container {
+    grid-template-columns: repeat(5, 1fr); /* 5 карточек в ряд на экранах до 1200px */
+  }
+}
+
+@media (max-width: 1024px) {
+  .cards-container {
+    grid-template-columns: repeat(4, 1fr); /* 4 карточки в ряд на экранах до 1024px */
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 карточки в ряд на экранах до 768px */
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-container {
+    grid-template-columns: 1fr; /* 1 карточка в ряд на экранах до 480px */
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  p {
+    font-size: 14px; /* Увеличиваем шрифт на маленьких экранах */
+  }
+
+  button {
+    font-size: 14px; /* Увеличиваем шрифт на маленьких экранах */
+    padding: 8px 12px;
+  }
+}
+
+.scenario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.scenario span {
+  white-space: nowrap;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.regenerate-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.regenerate-button:hover {
+  background-color: #0056b3;
+}
