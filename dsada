@@ -1,66 +1,233 @@
 import React, { useState } from "react";
-import Card from "./Card";
-import generateRandomAttributes from "./randomAttributes";
-import "./App.css";
 
-const App = () => {
-  const [cards, setCards] = useState(
-    Array.from({ length: 12 }, () => ({
-      id: crypto.randomUUID(), // Генерируем уникальный идентификатор
-      ...generateRandomAttributes(),
-      revealed: {
-        health: false,
-        profession: false,
-        hobby: false,
-        age: false,
-        phobia: false,
-      },
-      playerName: `Игрок ${Math.floor(Math.random() * 100)}`, // Для примера
-    }))
-  );
+const Card = ({ attributes, onToggle, playerName, onNameChange, onDelete }) => {
+  const { revealed, health, profession, hobby, age, phobia, backpack, fact, moovea, moovem } = attributes;
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
+  const [editableAttributes, setEditableAttributes] = useState(attributes);
 
-  const toggleReveal = (id, key) => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === id
-          ? {
-              ...card,
-              revealed: { ...card.revealed, [key]: !card.revealed[key] },
-            }
-          : card
-      )
-    );
+  const handleToggle = (key) => {
+    onToggle(key);
   };
 
-  const updatePlayerName = (id, newName) => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === id ? { ...card, playerName: newName } : card
-      )
-    );
+  const handleNameChange = (event) => {
+    onNameChange(event.target.value);
   };
 
-  const deleteCard = (id) => {
-    setCards((prevCards) => prevCards.filter((card) => card.id !== id));
+  const handleAttributeChange = (key, value) => {
+    setEditableAttributes((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
+
+  const downloadAttributes = () => {
+    let content = `Игрок: ${playerName}\n`;
+
+    content += `Здоровье: ${editableAttributes.health.disease} (Тяжесть: ${editableAttributes.health.severity})\n`;
+    content += `Профессия: ${editableAttributes.profession}\n`;
+    content += `Хобби: ${editableAttributes.hobby}\n`;
+    content += `Возраст: ${editableAttributes.age}\n`;
+    content += `Фобия: ${editableAttributes.phobia}\n`;
+    content += `Рюкзак: ${editableAttributes.backpack}\n`;
+    content += `Факт: ${editableAttributes.fact}\n`;
+    content += `Карточка 1: ${editableAttributes.moovea}\n`;
+    content += `Карточка 2: ${editableAttributes.moovem}\n`;
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${playerName}_attributes.txt`;
+    link.click();
+  };
+
+  const handleDelete = () => {
+    setIsDeleted(true);
+    onDelete(); // Вызываем функцию удаления
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing); // Переключаем режим редактирования
+  };
+
+  if (isDeleted) return null;
 
   return (
-    <div className="app">
-      <h1>Игра "Бункер"</h1>
-      <div className="cards-container">
-        {cards.map((card) => (
-          <Card
-            key={card.id} // Используем уникальный id как ключ
-            attributes={card}
-            onToggle={(key) => toggleReveal(card.id, key)}
-            playerName={card.playerName}
-            onNameChange={(newName) => updatePlayerName(card.id, newName)}
-            onDelete={() => deleteCard(card.id)} // Передаем id карточки
-          />
-        ))}
-      </div>
+    <div className="card">
+      <input
+        type="text"
+        value={playerName}
+        onChange={handleNameChange}
+        className="player-name"
+      />
+
+      {/* Здоровье */}
+      {revealed.health ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.health.disease}
+              onChange={(e) =>
+                handleAttributeChange("health", {
+                  ...editableAttributes.health,
+                  disease: e.target.value,
+                })
+              }
+            />
+          ) : (
+            <p onClick={() => handleToggle("health")}>
+              {health.disease} (Тяжесть: {health.severity})
+            </p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("health")}>---</p>
+      )}
+
+      {/* Профессия */}
+      {revealed.profession ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.profession}
+              onChange={(e) => handleAttributeChange("profession", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("profession")}>{profession}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("profession")}>---</p>
+      )}
+
+      {/* Хобби */}
+      {revealed.hobby ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.hobby}
+              onChange={(e) => handleAttributeChange("hobby", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("hobby")}>{hobby}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("hobby")}>---</p>
+      )}
+
+      {/* Возраст */}
+      {revealed.age ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.age}
+              onChange={(e) => handleAttributeChange("age", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("age")}>{age}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("age")}>---</p>
+      )}
+
+      {/* Фобия */}
+      {revealed.phobia ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.phobia}
+              onChange={(e) => handleAttributeChange("phobia", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("phobia")}>{phobia}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("phobia")}>---</p>
+      )}
+
+      {/* Рюкзак */}
+      {revealed.backpack ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.backpack}
+              onChange={(e) => handleAttributeChange("backpack", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("backpack")}>{backpack}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("backpack")}>---</p>
+      )}
+
+      {/* Факт */}
+      {revealed.fact ? (
+        <div>
+          {isEditing ? (
+            <textarea
+              value={editableAttributes.fact}
+              onChange={(e) => handleAttributeChange("fact", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("fact")}>{fact}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("fact")}>---</p>
+      )}
+
+      {/* Карточка 1 */}
+      {revealed.moovea ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.moovea}
+              onChange={(e) => handleAttributeChange("moovea", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("moovea")}>{moovea}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("moovea")}>---</p>
+      )}
+
+      {/* Карточка 2 */}
+      {revealed.moovem ? (
+        <div>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableAttributes.moovem}
+              onChange={(e) => handleAttributeChange("moovem", e.target.value)}
+            />
+          ) : (
+            <p onClick={() => handleToggle("moovem")}>{moovem}</p>
+          )}
+        </div>
+      ) : (
+        <p onClick={() => handleToggle("moovem")}>---</p>
+      )}
+
+      <button onClick={downloadAttributes}>Скачать характеристики</button>
+      <button onClick={handleDelete}>Удалить</button>
+
+      <button onClick={handleEditToggle}>
+        {isEditing ? "Сохранить изменения" : "Изменить характеристики"}
+      </button>
     </div>
   );
 };
 
-export default App;
+export default Card;
