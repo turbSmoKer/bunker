@@ -1,143 +1,66 @@
-/* App.css */
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f9;
-  color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
+import React, { useState } from "react";
+import Card from "./Card";
+import generateRandomAttributes from "./randomAttributes";
+import "./App.css";
 
-.app {
-  width: 100%;
-  max-width: 100%; /* Используем всю ширину экрана */
-  padding: 20px 10px; /* Убираем отступы по бокам */
-  text-align: center;
-  box-sizing: border-box;
-}
+const App = () => {
+  const [cards, setCards] = useState(
+    Array.from({ length: 12 }, () => ({
+      id: crypto.randomUUID(), // Генерируем уникальный идентификатор
+      ...generateRandomAttributes(),
+      revealed: {
+        health: false,
+        profession: false,
+        hobby: false,
+        age: false,
+        phobia: false,
+      },
+      playerName: `Игрок ${Math.floor(Math.random() * 100)}`, // Для примера
+    }))
+  );
 
-h1 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #444;
-}
+  const toggleReveal = (id, key) => {
+    setCards((prevCards) =>
+      prevCards.map((card) =>
+        card.id === id
+          ? {
+              ...card,
+              revealed: { ...card.revealed, [key]: !card.revealed[key] },
+            }
+          : card
+      )
+    );
+  };
 
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr); /* 6 карточек в ряд */
-  gap: 10px; /* Отступ между карточками 10px */
-  width: 100%;
-  box-sizing: border-box;
-}
+  const updatePlayerName = (id, newName) => {
+    setCards((prevCards) =>
+      prevCards.map((card) =>
+        card.id === id ? { ...card, playerName: newName } : card
+      )
+    );
+  };
 
-/* Card styles */
-.card {
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
+  const deleteCard = (id) => {
+    setCards((prevCards) => prevCards.filter((card) => card.id !== id));
+  };
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+  return (
+    <div className="app">
+      <h1>Игра "Бункер"</h1>
+      <div className="cards-container">
+        {cards.map((card) => (
+          <Card
+            key={card.id} // Используем уникальный id как ключ
+            attributes={card}
+            onToggle={(key) => toggleReveal(card.id, key)}
+            playerName={card.playerName}
+            onNameChange={(newName) => updatePlayerName(card.id, newName)}
+            onDelete={() => deleteCard(card.id)} // Передаем id карточки
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
-.player-name {
-  font-size: 18px; /* Увеличиваем шрифт */
-  margin-bottom: 12px;
-  padding: 10px; /* Увеличиваем отступы */
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-p {
-  margin: 8px 0;
-  font-size: 16px; /* Увеличиваем шрифт */
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  justify-content: space-between; /* Распределение элементов по бокам */
-  transition: background-color 0.2s;
-}
-
-p:hover {
-  background-color: #f0f0f0;
-  border-radius: 4px;
-}
-
-button {
-  margin-top: 12px;
-  padding: 10px 14px; /* Увеличиваем отступы */
-  font-size: 16px; /* Увеличиваем шрифт */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-button:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-button:nth-child(2) {
-  background-color: #dc3545;
-  color: white;
-}
-
-button:nth-child(2):hover {
-  background-color: #c82333;
-}
-
-/* Responsive design */
-@media (max-width: 1200px) {
-  .cards-container {
-    grid-template-columns: repeat(5, 1fr); /* 5 карточек в ряд на экранах до 1200px */
-  }
-}
-
-@media (max-width: 1024px) {
-  .cards-container {
-    grid-template-columns: repeat(4, 1fr); /* 4 карточки в ряд на экранах до 1024px */
-  }
-}
-
-@media (max-width: 768px) {
-  .cards-container {
-    grid-template-columns: repeat(3, 1fr); /* 3 карточки в ряд на экранах до 768px */
-  }
-}
-
-@media (max-width: 480px) {
-  .cards-container {
-    grid-template-columns: 1fr; /* 1 карточка в ряд на экранах до 480px */
-  }
-
-  h1 {
-    font-size: 20px;
-  }
-
-  .card {
-    padding: 12px;
-  }
-
-  p {
-    font-size: 14px; /* Увеличиваем шрифт на маленьких экранах */
-  }
-
-  button {
-    font-size: 14px; /* Увеличиваем шрифт на маленьких экранах */
-    padding: 8px 12px;
-  }
-}
+export default App;
