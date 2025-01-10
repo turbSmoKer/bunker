@@ -1,232 +1,145 @@
-import React, { useState } from "react";
-
-const Card = ({ attributes, onToggle, playerName, onNameChange, onDelete }) => {
-  const { revealed, health, profession, hobby, age, phobia, backpack, fact, moovea, moovem } = attributes;
-  const [isDeleted, setIsDeleted] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
-  const [editableAttributes, setEditableAttributes] = useState(attributes);
-
-  const handleToggle = (key) => {
-    onToggle(key);
+const attributesPool = {
+    health: [
+      { name: "Остудное заболевание (простуда)", severity: 10 },
+      { name: "Грипп", severity: 10 },
+      { name: "Ангина (тонзиллит)", severity: 15 },
+      { name: "Бронхит", severity: 15 },
+      { name: "Гастрит", severity: 20 },
+      { name: "Диабет 2 типа", severity: 25 },
+      { name: "Гипертония (высокое давление)", severity: 30 },
+      { name: "Астма", severity: 30 },
+      { name: "Пневмония", severity: 40 },
+      { name: "Инсульт", severity: 50 },
+      { name: "Инфаркт миокарда", severity: 50 },
+      { name: "Рак кожи", severity: 70 },
+      { name: "Рак легких", severity: 70 },
+      { name: "Рак груди", severity: 70 },
+      { name: "Болезнь Альцгеймера", severity: 40 },
+      { name: "Паркинсон", severity: 40 },
+      { name: "Ревматоидный артрит", severity: 25 },
+      { name: "Туберкулез", severity: 30 },
+      { name: "Сердечная недостаточность", severity: 50 },
+      { name: "Цирроз печени", severity: 50 },
+      { name: "Печеночная недостаточность", severity: 50 },
+      { name: "Хроническая обструктивная болезнь легких (ХОБЛ)", severity: 40 },
+      { name: "Миокардит", severity: 30 },
+      { name: "Гепатит B", severity: 20 },
+      { name: "Гепатит C", severity: 30 },
+      { name: "Молниеносная инфекция (сепсис)", severity: 50 },
+      { name: "Менингит", severity: 40 },
+      { name: "Эпилепсия", severity: 25 },
+      { name: "Шизофрения", severity: 30 },
+      { name: "Психоз", severity: 30 },
+      { name: "Сахарный диабет 1 типа", severity: 30 },
+      { name: "Инфекционный мононуклеоз", severity: 20 },
+      { name: "Панкреатит", severity: 30 },
+      { name: "Псориаз", severity: 20 },
+      { name: "Склероз", severity: 30 },
+      { name: "Тромбофлебит", severity: 25 },
+      { name: "Полиартрит", severity: 30 },
+      { name: "Геморрой", severity: 10 },
+      { name: "Невралгия", severity: 15 },
+      { name: "Глаукома", severity: 20 },
+      { name: "Аллергия", severity: 10 },
+      { name: "Гастроэзофагеальная рефлюксная болезнь (ГЭРБ)", severity: 20 },
+      { name: "Хронический синусит", severity: 15 },
+      { name: "Псевдотумор мозга", severity: 40 },
+      { name: "Анемия", severity: 20 },
+      { name: "Паралич", severity: 50 },
+      { name: "Ожирение", severity: 25 },
+      { name: "Гепатит D", severity: 20 },
+      { name: "Токсоплазмоз", severity: 15 },
+      { name: "Хроническая усталость", severity: 15 },
+      { name: "Параноидальная шизофрения", severity: 30 },
+      { name: "Миастения", severity: 25 },
+      { name: "Тромбоцитопения", severity: 20 },
+      { name: "Туберкулез кожи", severity: 20 },
+      { name: "Псевдопаралич", severity: 40 },
+      { name: "Болезнь Крона", severity: 30 },
+      { name: "Цистит", severity: 15 },
+      { name: "Полимиозит", severity: 30 },
+      { name: "Гломерулонефрит", severity: 25 },
+      { name: "Кистозная фиброз", severity: 30 },
+      { name: "Склеродермия", severity: 30 },
+      { name: "Аутоиммунный тиреоидит", severity: 25 },
+      { name: "Гипотиреоз", severity: 20 },
+      { name: "Гипертиреоз", severity: 20 },
+      { name: "Печеночный рак", severity: 50 },
+      { name: "Ожог 3 степени", severity: 40 },
+      { name: "Миокардиальная ишемия", severity: 30 },
+      { name: "Инфекционный эндокардит", severity: 40 },
+      { name: "Мочекаменная болезнь", severity: 20 },
+      { name: "Гипогликемия", severity: 15 },
+    ],
+    profession: ["Врач", "Инженер", "Учитель", "Художник", "Повар", "Программист", "Психолог", "Туристический гид", "Фотограф", "Архитектор", "Юрист", "Дизайнер", "Механик", "Стоматолог", "Педагог", "Музыкант", "Секретарь", "Журналист", "Менеджер", "Повар-кондитер", "Графический дизайнер", "Веб-разработчик", "Фармацевт", "Терапевт", "Физик", "Химик", "Экономист", "Математик", "Бухгалтер", "Актер", "Режиссер", "Писатель", "Педагог-психолог", "Тренер", "Логист", "Маркетолог", "Сварщик", "Операционный менеджер", "Риелтор", "Косметолог", "Бариста", "Техник", "Менеджер по продажам", "Кинолог", "Лесник", "Географ", "Историк", "Педагог-организатор", "Охранник", "Животновод", "Лаборант", "Психотерапевт", "Модель", "Массажист", "Дизайнер интерьеров", "Парикмахер", "Кондитер", "Водитель", "Техник по обслуживанию", "Специалист по PR", "Блогер", "Архивист", "Гид-переводчик", "Эколог", "Садовник", "Проектировщик", "Туроператор", "Палевед", "Оператор ПК", "Редактор", "Специалист по кадровым вопросам", "Аналитик", "Флорист", "Курьер", "Менеджер по работе с клиентами", "Картограф", "Генетик", "Дерматолог"],
+    hobby: ["Рисование", "Чтение", "Спорт", "Музыка", "Путешествия", "Готовка", "Фотография", "Плавание", "Велоспорт", "Йога", "Танцы", "Кулинария", "Путеводительство", "Садоводство", "Письмо", "Ремесла", "Рукоделие", "Вышивка", "Игры", "Бег", "Медитация", "Шитье", "Ремонт", "Кемпинг", "Путешествия по городам", "Скалодром", "Горные походы", "Кино", "Театр", "Картинг", "Серфинг", "Гольф", "Гардероб", "Рисование комиксов", "Скейтбординг", "Блогинг", "Путеводитель по культуре", "Заготовки на зиму", "Книголюб", "Творчество", "Стрит-арт", "Паркур", "Покер", "Путеводитель по уличной моде", "Ретро-игры", "Микроскопия", "Дрон-съемка", "Флешмоб", "Ретро-автомобили", "Моделирование", "Генеалогия", "Астрономия", "Театр теней", "Граффити", "Гипноз", "Бродяги", "Косплей", "Ретро-фото", "Этнография", "Реальные приключения", "Мифология", "Фетишизм моды", "Бодиарт", "Татуировки", "Психология отношений", "Фитнес-тренировки", "Сексуальное просвещение", "Психоанализ", "Фетиш-фото", "Ретро-игры для взрослых", "Танцы для взрослых", "Эксперименты с модой", "Театр импровизаций", "Реальные приключения", "Секс-позитивизм", "Фитнес и бодибилдинг", "Личностный рост", "Фетиш-фотография"],
+    age: ["18", "20", "25", "27", "30", "32", "35", "40"],
+    phobia: ["Замкнутые пространства", "Высота", "Темнота", "Насекомые", "Толпа", "Одиночество", "Пауки", "Змеи", "Собаки", "Гром", "Летучие мыши", "Вода", "Болезни", "Смерть", "Трупы", "Нечистая сила", "Магия", "Шум", "Клоуны", "Публичные выступления", "Боязнь людей", "Психопатия", "Потеря контроля", "Токсичные отношения", "Страх перед будущим", "Невозможность помочь", "Низкий уровень кислорода", "Боязнь потерять близких", "Незавершенность", "Технологии", "Перемены", "Восхождение на гору", "Крысы", "Молнии", "Забвение", "Невозможность быть собой", "Ожидание", "Отказ", "Скользкие поверхности", "Одиночество в толпе", "Тяжелые решения", "Глубокие водоемы", "Отсутствие звуков", "Потеря памяти", "Летящие объекты", "Силы природы", "Далекое будущее", "Невозможность двигаться", "Неизвестность", "Тени", "Силы темных искусств", "Заброшенные места", "Заболевания", "Болезни разума"],
+    backpack: ["Фонарь", "Генератор", "Вода (бутылка)", "Аптечка первой помощи", "Мультитул", "Карта", "Компас", "Защитный крем от солнца", "Зарядное устройство", "Солнечная батарея", "Теплый свитер", "Нож", "Лента (скотч)", "Портативная колонка", "Тканевая маска", "Блокнот и ручка", "Картриджи для фильтра воды", "Резервная батарея", "Перчатки", "Шарф", "Пластиковые пакеты", "Книга", "Лыжные перчатки", "Пончо", "Термос", "Спички в водонепроницаемом контейнере", "Зажигалка", "Запасные носки", "Запасные перчатки", "Плотная ткань (для укрытия)", "Аптечка с медикаментами", "Пластырь", "Туалетная бумага", "Мультитул с отвертками", "Резинка для волос", "Карандаш", "Параллельные батарейки", "Мешок для мусора", "Влажные салфетки", "Дождевик", "Пара солнцезащитных очков", "Фляга для воды", "Набор для чистки обуви", "Компактный коврик для сидения", "Шнурки", "Мешок для грязной одежды", "Налобный фонарь", "Набор для шитья", "Камера", "Лейкопластырь", "Стерео наушники", "Ветровка", "Плавательные очки", "Ловушка для насекомых", "Гриль для костра", "Картонные трубочки", "Тетрадь", "Пластиковая бутылка для воды", "Маска для сна", "Портативная плита", "Средство от комаров", "Ласты для плавания", "Лупа", "Термометр", "Держатель для телефона", "Бумажные стаканчики", "Пластиковая посуда", "Мел", "Зубная паста", "Дезодорант", "Блок для записей", "Антибиотики", "Леденцы от горла", "Пакет для замораживания", "Гель для рук", "Крем от ожогов", "Резиновая подушка", "Игрушка-антистресс", "Пластиковая чашка", "Увлажняющий крем", "Термометр для воды", "Плавник для снорклинга", "Салфетки для рук", "Зажигалка с несколькими функциями", "Мешок для белья", "Мелкие игрушки", "Компактная лопата", "Пачка сигарет", "Карманный вентилятор", "Спортивные бинты", "Губка для мытья посуды", "Леденцы", "Портативный зарядник", "Резиновая игрушка", "Блокнот для заметок", "Зубочистки", "Ушные палочки", "Картонный стаканчик", "Мешок для воды", "Шарик для стресса"],
+    fact: ["Воровал у родных", "Скрывал семью", "Было 3 любовницы", "Хотел свою дочь", "Умеет тушить пожары", "Стримил на твиче"],
+    moovea: ["Мут игрока", "Перемещение голоса", "Раскрыть характеристику", "Двойное раскрытие", "Испортить здоровье", "Обмен характеристиками", "Ограничение действий", "Обмен профессиями", "Замена любой характеристики на случайную", "Удаление голоса игрока на 1 круг", "Добавление игроку 1 голос"],
+    moovem: ["Восстановить здоровье", "Замена 1 любое условие бункера", "Иммунитет к исключению на 1 круг", "Скрыть характеристику", "Смена профессии", "Отмена действия", "Улучшение здоровья",  "Перегенерация характеристики", "Смена очередности"]
   };
+  let usedAttributes = {
+    profession: new Set(),
+    hobby: new Set(),
+    age: new Set(),
+    phobia: new Set(),
+    health: new Set(),
+    backpack: new Set(),
+    fact: new Set(),
+    moovea: new Set(),
+    moovem: new Set(),
 
-  const handleNameChange = (event) => {
-    onNameChange(event.target.value);
   };
-
-  const handleAttributeChange = (key, value) => {
-    setEditableAttributes((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   };
-
-  const downloadAttributes = () => {
-    let content = `Игрок: ${playerName}\n`;
-
-    content += `Здоровье: ${editableAttributes.health.disease} (Тяжесть: ${editableAttributes.health.severity})\n`;
-    content += `Профессия: ${editableAttributes.profession}\n`;
-    content += `Хобби: ${editableAttributes.hobby}\n`;
-    content += `Возраст: ${editableAttributes.age}\n`;
-    content += `Фобия: ${editableAttributes.phobia}\n`;
-    content += `Рюкзак: ${editableAttributes.backpack}\n`;
-    content += `Факт: ${editableAttributes.fact}\n`;
-    content += `Карточка 1: ${editableAttributes.moovea}\n`;
-    content += `Карточка 2: ${editableAttributes.moovem}\n`;
-
-    const blob = new Blob([content], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${playerName}_attributes.txt`;
-    link.click();
+  
+  const generateRandomAttributes = () => {
+    const selectedAttributes = {};
+  
+    // Для здоровья выбираем случайное заболевание и его тяжесть
+    const availableHealth = attributesPool.health.filter(
+      (item) => !usedAttributes.health.has(item.name)
+    );
+    
+    if (availableHealth.length === 0) {
+      selectedAttributes.health = null; // Если все заболевания использованы, ставим null
+    } else {
+      const shuffledHealth = shuffleArray(availableHealth);
+      const selectedHealth = shuffledHealth.pop();
+      selectedAttributes.health = {
+        disease: selectedHealth.name,
+        severity: selectedHealth.severity + "%",
+      };
+      usedAttributes.health.add(selectedHealth.name);
+    }
+  
+    // Для других атрибутов выбираем случайное значение, исключая уже использованные
+    Object.keys(attributesPool).forEach((key) => {
+      if (key !== "health") {
+        const availableValues = attributesPool[key].filter(
+          (value) => !usedAttributes[key].has(value)
+        );
+        if (availableValues.length > 0) {
+          const shuffled = shuffleArray(availableValues);
+          const selectedValue = shuffled.pop();
+          selectedAttributes[key] = selectedValue;
+          usedAttributes[key].add(selectedValue); // Помечаем выбранное значение как использованное
+        } else {
+          selectedAttributes[key] = null; // Если все значения использованы, ставим null
+        }
+      }
+    });
+  
+    return selectedAttributes;
   };
-
-  const handleDelete = () => {
-    setIsDeleted(true);
-    onDelete(); // Вызываем функцию удаления
-  };
-
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing); // Переключаем режим редактирования
-  };
-
-  if (isDeleted) return null;
-
-  return (
-    <div className="card">
-      <input
-        type="text"
-        value={playerName}
-        onChange={handleNameChange}
-        className="player-name"
-      />
-      <div>
-        <label>Здоровье:</label>
-        {revealed.health ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.health.disease}
-              onChange={(e) =>
-                handleAttributeChange("health", {
-                  ...editableAttributes.health,
-                  disease: e.target.value,
-                })
-              }
-            />
-          ) : (
-            <p onClick={() => handleToggle("health")}>
-              {health.disease} (Тяжесть: {health.severity})
-            </p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("health")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Профессия:</label>
-        {revealed.profession ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.profession}
-              onChange={(e) => handleAttributeChange("profession", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("profession")}>{profession}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("profession")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Хобби:</label>
-        {revealed.hobby ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.hobby}
-              onChange={(e) => handleAttributeChange("hobby", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("hobby")}>{hobby}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("hobby")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Возраст:</label>
-        {revealed.age ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.age}
-              onChange={(e) => handleAttributeChange("age", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("age")}>{age}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("age")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Фобия:</label>
-        {revealed.phobia ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.phobia}
-              onChange={(e) => handleAttributeChange("phobia", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("phobia")}>{phobia}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("phobia")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Рюкзак:</label>
-        {revealed.backpack ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.backpack}
-              onChange={(e) => handleAttributeChange("backpack", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("backpack")}>{backpack}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("backpack")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Факт:</label>
-        {revealed.fact ? (
-          isEditing ? (
-            <textarea
-              value={editableAttributes.fact}
-              onChange={(e) => handleAttributeChange("fact", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("fact")}>{fact}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("fact")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Карточка 1:</label>
-        {revealed.moovea ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.moovea}
-              onChange={(e) => handleAttributeChange("moovea", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("moovea")}>{moovea}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("moovea")}>---</p>
-        )}
-      </div>
-
-      <div>
-        <label>Карточка 2:</label>
-        {revealed.moovem ? (
-          isEditing ? (
-            <input
-              type="text"
-              value={editableAttributes.moovem}
-              onChange={(e) => handleAttributeChange("moovem", e.target.value)}
-            />
-          ) : (
-            <p onClick={() => handleToggle("moovem")}>{moovem}</p>
-          )
-        ) : (
-          <p onClick={() => handleToggle("moovem")}>---</p>
-        )}
-      </div>
-
-      <button onClick={downloadAttributes}>Скачать характеристики</button>
-      <button onClick={handleDelete}>Удалить</button>
-
-      <button onClick={handleEditToggle}>
-        {isEditing ? "Сохранить изменения" : "Изменить характеристики"}
-      </button>
-    </div>
-  );
-};
-
-export default Card;
+  
+  export default generateRandomAttributes;
